@@ -16,8 +16,9 @@
     <version>1.0.0</version>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <netty-socketio.version>1.7.7</netty-socketio.version>
+        <collaborative-engine.version>1.0.0</collaborative-engine.version>
     </properties>
 
     <dependencies>
@@ -49,6 +50,12 @@
             <groupId>com.corundumstudio.socketio</groupId>
             <artifactId>netty-socketio</artifactId>
             <version>${netty-socketio.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.excellent-cancer</groupId>
+            <artifactId>collaborative-engine</artifactId>
+            <version>${collaborative-engine.version}</version>
         </dependency>
     </dependencies>
 
