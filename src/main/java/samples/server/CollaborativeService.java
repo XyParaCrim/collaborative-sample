@@ -3,7 +3,9 @@ package samples.server;
 import collaborative.engine.operation.EditOperationRequest;
 import collaborative.engine.vcs.CommitStream;
 import collaborative.engine.vcs.EditVersionControl;
-import com.corundumstudio.socketio.*;
+import com.corundumstudio.socketio.AckRequest;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
@@ -15,7 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import static samples.server.VcsUtils.*;
+import static samples.server.VcsUtils.COMMIT_STREAM;
+import static samples.server.VcsUtils.ifCommitStreamPresent;
 
 /**
  * Socket.io server
@@ -81,7 +84,7 @@ public final class CollaborativeService {
         private CommitStream newCommitStream(final SocketIOClient client) {
             return versionControl.newCommitStream()
                     .onClose(() -> client.del(COMMIT_STREAM))
-                    .onNext(commit -> client.sendEvent("update", new UpdateAckCallback(commit, client), commit));
+                    .onNewVersion(commit -> client.sendEvent("update", new UpdateAckCallback(commit, client), commit));
         }
 
         @OnEvent("sure-open")

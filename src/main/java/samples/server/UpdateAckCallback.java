@@ -1,7 +1,7 @@
 package samples.server;
 
 import collaborative.engine.vcs.Commit;
-import collaborative.engine.vcs.CommitStream;
+import collaborative.engine.vcs.commitStream;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.VoidAckCallback;
 
@@ -19,14 +19,11 @@ class UpdateAckCallback extends VoidAckCallback {
 
     @Override
     protected void onSuccess() {
-        ifCommitStreamPresent(client, commitStream -> {
-            commitStream.moveTo(commit);
-            commitStream.resume();
-        });
+        ifCommitStreamPresent(client, commitStream -> commitStream.moveTo(commit).resume());
     }
 
     @Override
     public void onTimeout() {
-        ifCommitStreamPresent(client, CommitStream::resume);
+        ifCommitStreamPresent(client, commitStream::resume);
     }
 }
