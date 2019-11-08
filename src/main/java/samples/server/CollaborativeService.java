@@ -1,7 +1,6 @@
 package samples.server;
 
 import collaborative.engine.operation.EditOperationRequest;
-import collaborative.engine.vcs.Commit;
 import collaborative.engine.vcs.CommitStream;
 import collaborative.engine.vcs.EditVersionControl;
 import com.corundumstudio.socketio.*;
@@ -15,7 +14,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.function.Consumer;
+
+import static samples.server.VcsUtils.*;
 
 /**
  * Socket.io server
@@ -24,6 +24,7 @@ import java.util.function.Consumer;
  */
 @Component
 public final class CollaborativeService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CollaborativeService.class);
 
     @Autowired
@@ -33,7 +34,6 @@ public final class CollaborativeService {
 
     @PostConstruct
     public void start() {
-
         ioServer.addListeners(new OnConnection());
         ioServer.addListeners(new OnCollaborative());
         ioServer.start();
@@ -61,8 +61,9 @@ public final class CollaborativeService {
         }
     }
 
-    private static final String COMMIT_STREAM = "commit";
-
+    /**
+     * About collaborative-editing listener
+     */
     @SuppressWarnings("unused")
     private class OnCollaborative {
         @OnEvent("open")
@@ -99,34 +100,4 @@ public final class CollaborativeService {
         }
     }
 
-    private static void ifCommitStreamPresent(SocketIOClient client, Consumer<CommitStream> handler) {
-        CommitStream commitStream = client.get(COMMIT_STREAM);
-        if (commitStream != null) {
-            handler.accept(commitStream);
-        }
-    }
-
-    private static class UpdateAckCallback extends VoidAckCallback {
-
-        final Commit commit;
-        final SocketIOClient client;
-
-        UpdateAckCallback(Commit commit, SocketIOClient client) {
-            this.commit = commit;
-            this.client = client;
-        }
-
-        @Override
-        protected void onSuccess() {
-            ifCommitStreamPresent(client, commitStream -> {
-                commitStream.moveTo(commit);
-                commitStream.resume();
-            });
-        }
-
-        @Override
-        public void onTimeout() {
-            ifCommitStreamPresent(client, CommitStream::resume);
-        }
-    }
 }
